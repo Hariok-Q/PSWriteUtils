@@ -47,7 +47,7 @@ function Write-ColorTags {
         [switch] $NoNewLine
     )
 
-    $tokenPattern = '(?<escape><?)(?<total><: *(?<foreground>\w*), *(?<background>\w*) *>)'
+    $tokenPattern = '(?<escape><)?(?<total><: *(?<foreground>\w*), *(?<background>\w*) *>)'
 
     $tags = (Select-String -InputObject $Text -Pattern $tokenPattern -AllMatches).Matches
 
@@ -55,13 +55,11 @@ function Write-ColorTags {
     $foregroundColor = $DefaultForegroundColor
     $backgroundColor = $DefaultBackgroundColor
     foreach ($tag in $tags) {
+        Write-Host $Text.Substring($position, $tag.Index - $position) -ForegroundColor $foregroundColor -BackgroundColor $backgroundColor -NoNewline
+
         if ($tag.Groups['escape'].Value) {
             Write-Host $tag.Groups['total'].Value -ForegroundColor $foregroundColor -BackgroundColor $backgroundColor -NoNewline
-            $position = $tag.Index + $tag.Length
-            Continue
         }
-
-        Write-Host $Text.Substring($position, $tag.Index - $position) -ForegroundColor $foregroundColor -BackgroundColor $backgroundColor -NoNewline
 
         $position = $tag.Index + $tag.Length
 
