@@ -2,11 +2,13 @@
 
 PSWriteUtils is a PowerShell module that adds some cmdlets to make writing text to the console window easier and faster.
 
+It can be specially useful to write text interfaces and menus.
+
 The most important cmdlet is `Write-ColorTags`, but it also exposes `Write-Status`, `Write-Options` and `Write-Countdown`.
 
 
 
-## `Write-ColorTags`
+## Write-ColorTags
 
 `Write-ColorTags` allows writing tags in the format `<:foregroundColor, backgroundColor>` on the text body in order to change the color of the printed text.
 
@@ -14,14 +16,14 @@ All of the text that comes after the tag will print in the specified color. In o
 
 To escape the tag, use double left angle brackets `<<` instead of single (`<<:foreground, background>`).
 
-Example:
+**Example:**
 
 ```powershell
 Write-ColorTags -Text @"
-This text is in default color, but <:black, red>from now on we're using black foreground with red background.
-Even after line breaks.
-If we want to reset to <:,>default, we can simply write <<:,> (because <:cyan,>empty tags<:,> reset to default colors.)
-@"
+This text is in default color, but from now on <:black, red>we're using black foreground with red background.
+It continues even after line breaks.
+If we want to reset to<:,> default, we can simply write <<:,> (because <:cyan,>empty tags<:,> reset to default colors.)
+"@
 ```
 
 
@@ -43,7 +45,7 @@ Optional details of the success message.
 
 The `TYPE` string (`INFO`, `FAIL` or `SUCCESS`) is colored accordingly.
 
-Example:
+**Example:**
 
 ```powershell
 Write-Status -Type Fail -Message 'copying files failed.' -Details @"
@@ -58,7 +60,7 @@ The following file already exists at the destination:
 
 Writes colored options for the user to choose from (useful when creating text interfaces).
 
-Example:
+**Example:**
 
 ```powershell
 Write-Option -Key '1' -Name "File to be copied:     " -CurrentValue 'C:\testFile.txt'
@@ -76,7 +78,7 @@ Notice that `Write-Option` may have a `CurrentValue` parameter. If no value is p
 
 Writes a countdown that changes in-line.
 
-Example:
+**Example:**
 
 ```powershell
 Write-Countdown -Message "Waiting..." -Seconds 5
