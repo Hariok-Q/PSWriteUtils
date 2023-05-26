@@ -132,7 +132,7 @@ function Write-Status {
 function Write-Option {
     param(
         [Parameter(Mandatory)]
-        [char] $Key,
+        [string] $Key,
 
         [Parameter(Mandatory)]
         [string] $Name,
