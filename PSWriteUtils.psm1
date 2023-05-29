@@ -40,6 +40,103 @@ $CountdownSecondsForegroundColor = 'Cyan'
 
 #endregion
 
+class WriteUtils {
+    $Settings = [PSCustomObject]@{
+        ConsoleDefault = [PSCustomObject]@{
+            ForegroundColor = 'Gray';
+            BackgroundColor = 'Black'
+        };
+
+        WriteOption = [PSCustomObject]@{
+            Indentation = 0;
+            Valid = [PSCustomObject]@{
+                General = [PSCustomObject]@{
+                    ForegroundColor = 'Gray';
+                    BackgroundColor = 'Black'
+                };
+                Key = [PSCustomObject]@{
+                    ForegroundColor = 'Yellow';
+                    BackgroundColor = 'Black'
+                };
+                KeyBrackets = [PSCustomObject]@{
+                    ForegroundColor = 'Gray';
+                    BackgroundColor = 'Black'
+                };
+                Value = [PSCustomObject]@{
+                    ForegroundColor = 'Gray';
+                    BackgroundColor = 'Black'
+                }
+            };
+            Invalid = [PSCustomObject]@{
+                General = [PSCustomObject]@{
+                    ForegroundColor = 'DarkGray';
+                    BackgroundColor = 'Black'
+                };
+                Key = [PSCustomObject]@{
+                    ForegroundColor = 'Red';
+                    BackgroundColor = 'Black'
+                };
+                KeyBrackets = [PSCustomObject]@{
+                    ForegroundColor = 'Gray';
+                    BackgroundColor = 'Black'
+                };
+                Value = [PSCustomObject]@{
+                    ForegroundColor = 'DarkGray';
+                    BackgroundColor = 'Black';
+                    Text = '<INVALID>'
+                }
+            }
+        };
+
+        WriteStatus = [PSCustomObject]@{
+            Indentation = 0;
+            Message = [PSCustomObject]@{
+                ForegroundColor = 'White';
+                BackgroundColor = 'Black'
+            };
+            Type = [PSCustomObject]@{
+                Info = [PSCustomObject]@{
+                    Text = 'INFO';
+                    ForegroundColor = 'Blue';
+                    BackgroundColor = 'Black'
+                };
+                Success = [PSCustomObject]@{
+                    Text = 'SUCCESS';
+                    ForegroundColor = 'Green';
+                    BackgroundColor = 'Black'
+                };
+                Fail = [PSCustomObject]@{
+                    Text = 'FAIL';
+                    ForegroundColor = 'Red';
+                    BackgroundColor = 'Black'
+                }
+            };
+            Details = [PSCustomObject]@{
+                Indentation = 4;
+                ForegroundColor = 'Gray';
+                BackgroundColor = 'Black'
+            }
+        };
+
+        WriteCountdown = [PSCustomObject]@{
+            Indentation = 0;
+            Message = [PSCustomObject]@{
+                Text = 'Waiting... ';
+                ForegroundColor = 'White';
+                BackgroundColor = 'Black'
+            };
+            Seconds = [PSCustomObject]@{
+                ForegroundColor = 'Cyan';
+                BackgroundColor = 'Black'
+            }
+        }
+    }
+
+    WriteUtils() {
+    }
+}
+
+
 
 function Write-ColorTags {
     Param(
