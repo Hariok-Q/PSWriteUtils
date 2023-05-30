@@ -7,6 +7,36 @@ class PSWriteUtils {
             BackgroundColor = 'Default'
         };
 
+        WriteStatus = @{
+            Indentation = 0;
+            Message = @{
+                ForegroundColor = 'White';
+                BackgroundColor = 'Black'
+            };
+            Type = @{
+                Info = @{
+                    Text = 'INFO';
+                    ForegroundColor = 'Blue';
+                    BackgroundColor = 'Black'
+                };
+                Success = @{
+                    Text = 'SUCCESS';
+                    ForegroundColor = 'Green';
+                    BackgroundColor = 'Black'
+                };
+                Fail = @{
+                    Text = 'FAIL';
+                    ForegroundColor = 'Red';
+                    BackgroundColor = 'Black'
+                }
+            };
+            Details = @{
+                Indentation = 4;
+                ForegroundColor = 'Gray';
+                BackgroundColor = 'Default'
+            }
+        };
+
         WriteOption = @{
             Indentation = 0;
             Valid = @{
@@ -45,36 +75,6 @@ class PSWriteUtils {
                     BackgroundColor = 'Default';
                     Text = '<INVALID>'
                 }
-            }
-        };
-
-        WriteStatus = @{
-            Indentation = 0;
-            Message = @{
-                ForegroundColor = 'White';
-                BackgroundColor = 'Black'
-            };
-            Type = @{
-                Info = @{
-                    Text = 'INFO';
-                    ForegroundColor = 'Blue';
-                    BackgroundColor = 'Black'
-                };
-                Success = @{
-                    Text = 'SUCCESS';
-                    ForegroundColor = 'Green';
-                    BackgroundColor = 'Black'
-                };
-                Fail = @{
-                    Text = 'FAIL';
-                    ForegroundColor = 'Red';
-                    BackgroundColor = 'Black'
-                }
-            };
-            Details = @{
-                Indentation = 4;
-                ForegroundColor = 'Gray';
-                BackgroundColor = 'Default'
             }
         };
 
@@ -211,8 +211,11 @@ class PSWriteUtils {
         }
     }
 
-    [void] WriteOption([string] $Key, [string] $Name, [string] $CurrentValue, [bool] $IgnoreInvalid) {
+    [void] WriteOption([string] $Key, [string] $Name, [string] $CurrentValue, [bool] $IgnoreInvalid, [int] $Indentation) {
         $valid = $IgnoreInvalid -or ([bool] $CurrentValue)
+        if ($Indentation -lt 0) {
+            $Indentation = $this.Settings.WriteOption.Indentation
+        }
 
         if (-not $valid) {
             $keyForeground = $this.Settings.WriteOption.Invalid.Key.ForegroundColor
@@ -235,7 +238,7 @@ class PSWriteUtils {
             $CurrentValueForeground = $this.Settings.WriteOption.Valid.Value.ForegroundColor
             $CurrentValueBackground = $this.Settings.WriteOption.Valid.Value.BackgroundColor
         }
-        Write-Host (' ' * $this.Settings.WriteOption.Indentation) -NoNewline
+        Write-Host (' ' * $Indentation) -NoNewline
         Write-Host '[' -ForegroundColor $keyBracketsForeground -BackgroundColor $keyBracketsBackground -NoNewline
         Write-Host $Key -ForegroundColor $keyForeground -BackgroundColor $keyBackground -NoNewline
         Write-Host ']' -ForegroundColor $keyBracketsForeground -BackgroundColor $keyBracketsBackground -NoNewline
@@ -243,22 +246,25 @@ class PSWriteUtils {
         Write-Host $CurrentValue -ForegroundColor $CurrentValueForeground -BackgroundColor $CurrentValueBackground
     }
 
-    [void] WriteCountdown([string] $Message, [int] $Seconds) {
+    [void] WriteCountdown([string] $Message, [int] $Seconds, [int] $Indentation) {
         if (-not $Message) {
             $Message = $this.Settings.WriteCountdown.Message.Text
         }
         if ($Seconds -lt 1) {
             $Seconds = $this.Settings.WriteCountdown.Seconds.Amount
         }
+        if ($Indentation -lt 0) {
+            $Indentation = $this.Settings.WriteCountdown.Indentation
+        }
 
         foreach ($i in $Seconds..1) {
-            Write-Host ("`r" + (' ' * $this.Settings.WriteCountdown.Indentation)) -NoNewline
+            Write-Host ("`r" + (' ' * $Indentation)) -NoNewline
             Write-Host $Message -ForegroundColor $this.Settings.WriteCountdown.Message.ForegroundColor -BackgroundColor $this.Settings.WriteCountdown.Message.BackgroundColor -NoNewline
             Write-Host $i.ToString().PadRight($Seconds.ToString().Length) -ForegroundColor $this.Settings.WriteCountdown.Seconds.ForegroundColor -BackgroundColor $this.Settings.WriteCountdown.Seconds.BackgroundColor -NoNewline
             Start-Sleep -Seconds 1
         }
     
-        Write-Host ("`r" + ' ' * ($this.Settings.WriteCountdown.Indentation + $Message.Length + $Seconds.ToString().Length + 1) + "`r") -NoNewline
+        Write-Host ("`r" + ' ' * ($Indentation + $Message.Length + $Seconds.ToString().Length + 1) + "`r") -NoNewline
     }
 
 }
