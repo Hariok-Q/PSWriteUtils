@@ -199,7 +199,10 @@ class PSWriteUtils {
         }
         Write-Host $Text.Substring($position, $Text.Length - $position) `
             -ForegroundColor $colors['Foreground'] `
-            -BackgroundColor $colors['Background'] -NoNewline:$NoNewLine
+            -BackgroundColor $colors['Background'] -NoNewline
+
+        #   Workaround for known Powershell bug #18984 (https://github.com/PowerShell/PowerShell/issues/18984)
+        Write-Host '' -NoNewline:$NoNewLine
     }
 
     [void] WriteStatus([string] $Type, [string] $Message, [string] $Details) {
