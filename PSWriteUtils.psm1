@@ -93,7 +93,7 @@ class PSWriteUtils {
             }
         }
     }
-    hidden $ResolvedSettings = @{}
+    hidden $AppliedSettings = @{}
 
     hidden static $ColorTagsRegex = [Regex]::new(
         '(?<Escape><)?(?<Total><: *(?<Foreground>\w*), *(?<Background>\w*) *>)',
@@ -106,21 +106,21 @@ class PSWriteUtils {
 
 
     PSWriteUtils() {
-        $this.ResolveSettings()
+        $this.ApplySettings()
     }
 
-    [void] ResolveSettings() {
-        $this.ResolvedSettings = [PSSerializer]::Deserialize([PSSerializer]::Serialize($this.Settings))
-        $this.RecursiveResolveSettingsColors($this.ResolvedSettings)
-        $Global:Host.UI.RawUI.ForegroundColor = $this.ResolvedSettings.Defaults.ForegroundColor
-        $Global:Host.UI.RawUI.BackgroundColor = $this.ResolvedSettings.Defaults.BackgroundColor
+    [void] ApplySettings() {
+        $this.AppliedSettings = [PSSerializer]::Deserialize([PSSerializer]::Serialize($this.Settings))
+        $this.RecursiveResolveSettingsColors($this.AppliedSettings)
+        $Global:Host.UI.RawUI.ForegroundColor = $this.AppliedSettings.Defaults.ForegroundColor
+        $Global:Host.UI.RawUI.BackgroundColor = $this.AppliedSettings.Defaults.BackgroundColor
     }
 
-    hidden [void] RecursiveResolveSettingsColors([hashtable]$ResolvedSettings) {
-        $keys = [array]$ResolvedSettings.Keys
+    hidden [void] RecursiveResolveSettingsColors([hashtable]$SettingsNode) {
+        $keys = [array]$SettingsNode.Keys
         for ($i = 0; $i -lt $keys.Count; $i++) {
             $key = $keys[$i]
-            $value = $ResolvedSettings[$key]
+            $value = $SettingsNode[$key]
 
             if ($value -is [hashtable]) {
                 $this.RecursiveResolveSettingsColors($value)
@@ -130,7 +130,7 @@ class PSWriteUtils {
             $regexMatch = [PSWriteUtils]::ColorSettingsRegex.Match($key)
             if (-not $regexMatch.Success) { continue }
 
-            $ResolvedSettings[$key] = $this.ResolveSettingsColorName($value.ToString(), $regexMatch.Groups['Type'].Value)
+            $SettingsNode[$key] = $this.ResolveSettingsColorName($value.ToString(), $regexMatch.Groups['Type'].Value)
         }
     }
 
@@ -166,8 +166,8 @@ class PSWriteUtils {
 
         $position = 0
         $colors = @{
-            'Foreground' = $this.ResolvedSettings.Defaults.ForegroundColor;
-            'Background' = $this.ResolvedSettings.Defaults.BackgroundColor
+            'Foreground' = $this.AppliedSettings.Defaults.ForegroundColor;
+            'Background' = $this.AppliedSettings.Defaults.BackgroundColor
         }
 
         foreach ($tag in $tagMatches) {
@@ -186,7 +186,7 @@ class PSWriteUtils {
 
             foreach ($colorType in $colors.Clone().Keys) {
                 if ((-not $tag.Groups[$colorType].Value) -or ($tag.Groups[$colorType].Value -eq 'Default')) {
-                    $colors[$colorType] = $this.ResolvedSettings.Defaults["${colorType}Color"]
+                    $colors[$colorType] = $this.AppliedSettings.Defaults["${colorType}Color"]
                 }
                 else {
                     $colors[$colorType] = $tag.Groups[$colorType].Value
@@ -211,14 +211,14 @@ class PSWriteUtils {
         }
 
         $padding = (@(
-            $this.ResolvedSettings.WriteStatus.Type.Info.Text.Length,
-            $this.ResolvedSettings.WriteStatus.Type.Success.Text.Length,
-            $this.ResolvedSettings.WriteStatus.Type.Fail.Text.Length
+            $this.AppliedSettings.WriteStatus.Type.Info.Text.Length,
+            $this.AppliedSettings.WriteStatus.Type.Success.Text.Length,
+            $this.AppliedSettings.WriteStatus.Type.Fail.Text.Length
         ) | Measure-Object -Maximum).Maximum
         $Message = $Message.Trim()
         $Details = $Details.Trim()
 
-        $typeString = $this.ResolvedSettings.WriteStatus.Type[$Type].Text
+        $typeString = $this.AppliedSettings.WriteStatus.Type[$Type].Text
         if ($Message) {
             $typeString = $typeString + ':'
             $padding++
@@ -226,19 +226,19 @@ class PSWriteUtils {
         }
         $typeString = $typeString.PadRight($padding)
 
-        Write-Host (' ' * $this.ResolvedSettings.WriteStatus.Indentation) -NoNewline
+        Write-Host (' ' * $this.AppliedSettings.WriteStatus.Indentation) -NoNewline
         Write-Host $typeString `
-            -ForegroundColor $this.ResolvedSettings.WriteStatus.Type[$Type].ForegroundColor `
-            -BackgroundColor $this.ResolvedSettings.WriteStatus.Type[$Type].BackgroundColor -NoNewline
+            -ForegroundColor $this.AppliedSettings.WriteStatus.Type[$Type].ForegroundColor `
+            -BackgroundColor $this.AppliedSettings.WriteStatus.Type[$Type].BackgroundColor -NoNewline
         Write-Host $Message `
-            -ForegroundColor $this.ResolvedSettings.WriteStatus.Message.ForegroundColor `
-            -BackgroundColor $this.ResolvedSettings.WriteStatus.Message.BackgroundColor
+            -ForegroundColor $this.AppliedSettings.WriteStatus.Message.ForegroundColor `
+            -BackgroundColor $this.AppliedSettings.WriteStatus.Message.BackgroundColor
         if ($Details) {
             foreach ($line in ($Details -split "\r?\n")) {
-                Write-Host (' ' * $this.ResolvedSettings.WriteStatus.Details.Indentation) -NoNewline
+                Write-Host (' ' * $this.AppliedSettings.WriteStatus.Details.Indentation) -NoNewline
                 Write-Host $line `
-                    -ForegroundColor $this.ResolvedSettings.WriteStatus.Details.ForegroundColor `
-                    -BackgroundColor $this.ResolvedSettings.WriteStatus.Details.BackgroundColor
+                    -ForegroundColor $this.AppliedSettings.WriteStatus.Details.ForegroundColor `
+                    -BackgroundColor $this.AppliedSettings.WriteStatus.Details.BackgroundColor
             }
         }
     }
@@ -248,50 +248,50 @@ class PSWriteUtils {
         $validitySettingsName = 'Valid'
         if (-not $valid) {
             $validitySettingsName = 'Invalid'
-            $CurrentValue = $this.ResolvedSettings.WriteOption[$validitySettingsName].Value.Text
+            $CurrentValue = $this.AppliedSettings.WriteOption[$validitySettingsName].Value.Text
         }
 
         if ($Indentation -lt 0) {
-            $Indentation = $this.ResolvedSettings.WriteOption.Indentation
+            $Indentation = $this.AppliedSettings.WriteOption.Indentation
         }
 
         Write-Host (' ' * $Indentation) -NoNewline
         Write-Host '[' `
-            -ForegroundColor $this.ResolvedSettings.WriteOption[$validitySettingsName].KeyBrackets.ForegroundColor `
-            -BackgroundColor $this.ResolvedSettings.WriteOption[$validitySettingsName].KeyBrackets.BackgroundColor -NoNewline
+            -ForegroundColor $this.AppliedSettings.WriteOption[$validitySettingsName].KeyBrackets.ForegroundColor `
+            -BackgroundColor $this.AppliedSettings.WriteOption[$validitySettingsName].KeyBrackets.BackgroundColor -NoNewline
         Write-Host $Key `
-            -ForegroundColor $this.ResolvedSettings.WriteOption[$validitySettingsName].Key.ForegroundColor `
-            -BackgroundColor $this.ResolvedSettings.WriteOption[$validitySettingsName].Key.BackgroundColor -NoNewline
+            -ForegroundColor $this.AppliedSettings.WriteOption[$validitySettingsName].Key.ForegroundColor `
+            -BackgroundColor $this.AppliedSettings.WriteOption[$validitySettingsName].Key.BackgroundColor -NoNewline
         Write-Host ']' `
-            -ForegroundColor $this.ResolvedSettings.WriteOption[$validitySettingsName].KeyBrackets.ForegroundColor `
-            -BackgroundColor $this.ResolvedSettings.WriteOption[$validitySettingsName].KeyBrackets.BackgroundColor -NoNewline
+            -ForegroundColor $this.AppliedSettings.WriteOption[$validitySettingsName].KeyBrackets.ForegroundColor `
+            -BackgroundColor $this.AppliedSettings.WriteOption[$validitySettingsName].KeyBrackets.BackgroundColor -NoNewline
         Write-Host " $Name " `
-            -ForegroundColor $this.ResolvedSettings.WriteOption[$validitySettingsName].General.ForegroundColor `
-            -BackgroundColor $this.ResolvedSettings.WriteOption[$validitySettingsName].General.BackgroundColor -NoNewline
+            -ForegroundColor $this.AppliedSettings.WriteOption[$validitySettingsName].General.ForegroundColor `
+            -BackgroundColor $this.AppliedSettings.WriteOption[$validitySettingsName].General.BackgroundColor -NoNewline
         Write-Host $CurrentValue `
-            -ForegroundColor $this.ResolvedSettings.WriteOption[$validitySettingsName].Value.ForegroundColor `
-            -BackgroundColor $this.ResolvedSettings.WriteOption[$validitySettingsName].Value.BackgroundColor
+            -ForegroundColor $this.AppliedSettings.WriteOption[$validitySettingsName].Value.ForegroundColor `
+            -BackgroundColor $this.AppliedSettings.WriteOption[$validitySettingsName].Value.BackgroundColor
     }
 
     [void] WriteCountdown([string] $Message, [int] $Seconds, [int] $Indentation) {
         if (-not $Message) {
-            $Message = $this.ResolvedSettings.WriteCountdown.Message.Text
+            $Message = $this.AppliedSettings.WriteCountdown.Message.Text
         }
         if ($Seconds -lt 1) {
-            $Seconds = $this.ResolvedSettings.WriteCountdown.Seconds.Amount
+            $Seconds = $this.AppliedSettings.WriteCountdown.Seconds.Amount
         }
         if ($Indentation -lt 0) {
-            $Indentation = $this.ResolvedSettings.WriteCountdown.Indentation
+            $Indentation = $this.AppliedSettings.WriteCountdown.Indentation
         }
 
         foreach ($i in $Seconds..1) {
             Write-Host ("`r" + (' ' * $Indentation)) -NoNewline
             Write-Host $Message `
-                -ForegroundColor $this.ResolvedSettings.WriteCountdown.Message.ForegroundColor `
-                -BackgroundColor $this.ResolvedSettings.WriteCountdown.Message.BackgroundColor -NoNewline
+                -ForegroundColor $this.AppliedSettings.WriteCountdown.Message.ForegroundColor `
+                -BackgroundColor $this.AppliedSettings.WriteCountdown.Message.BackgroundColor -NoNewline
             Write-Host $i.ToString().PadRight($Seconds.ToString().Length) `
-                -ForegroundColor $this.ResolvedSettings.WriteCountdown.Seconds.ForegroundColor `
-                -BackgroundColor $this.ResolvedSettings.WriteCountdown.Seconds.BackgroundColor -NoNewline
+                -ForegroundColor $this.AppliedSettings.WriteCountdown.Seconds.ForegroundColor `
+                -BackgroundColor $this.AppliedSettings.WriteCountdown.Seconds.BackgroundColor -NoNewline
             Start-Sleep -Seconds 1
         }
     

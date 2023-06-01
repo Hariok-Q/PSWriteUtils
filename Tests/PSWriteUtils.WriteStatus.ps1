@@ -30,7 +30,7 @@ $PSWriteUtils.Settings.WriteStatus.Type.Fail.BackgroundColor = 'white'
 $PSWriteUtils.Settings.WriteStatus.Details.Indentation = 8
 $PSWriteUtils.Settings.WriteStatus.Details.ForegroundColor = 'blue'
 $PSWriteUtils.Settings.WriteStatus.Details.BackgroundColor = 'darkblue'
-$PSWriteUtils.ResolveSettings()
+$PSWriteUtils.ApplySettings()
 Write-Status -Type 'info' -Message 'Information message' -Details "These are the details."
 Write-Host ''
 Write-Status -Type 'suCCess' -Message 'Success message' -Details "These are the details."
