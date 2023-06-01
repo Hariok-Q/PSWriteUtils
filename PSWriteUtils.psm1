@@ -229,7 +229,7 @@ class PSWriteUtils {
         Write-Host (' ' * $this.ResolvedSettings.WriteStatus.Indentation) -NoNewline
         Write-Host $typeString `
             -ForegroundColor $this.ResolvedSettings.WriteStatus.Type[$Type].ForegroundColor `
-            -BackgroundColor $this.ResolvedSettings.WriteStatus.Type[$Type].ForegroundColor -NoNewline
+            -BackgroundColor $this.ResolvedSettings.WriteStatus.Type[$Type].BackgroundColor -NoNewline
         Write-Host $Message `
             -ForegroundColor $this.ResolvedSettings.WriteStatus.Message.ForegroundColor `
             -BackgroundColor $this.ResolvedSettings.WriteStatus.Message.BackgroundColor
