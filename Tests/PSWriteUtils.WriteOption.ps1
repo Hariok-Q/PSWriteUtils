@@ -1,6 +1,5 @@
 using module '..\PSWriteUtils.psm1'
 
-Write-Host ''
 Write-ColorTags -Text "    <:black, white> Write-Option: Default settings "
 Write-Option -Key 1 -Name "Key 1" -CurrentValue "This is the VALUE" -Indentation -1
 Write-Option -Key 2 -Name "Key 2" -CurrentValue "This is the VALUE" -Indentation 4

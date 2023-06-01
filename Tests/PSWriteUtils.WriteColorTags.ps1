@@ -1,6 +1,5 @@
 using module '..\PSWriteUtils.psm1'
 
-Write-Host ''
 Write-ColorTags -Text @"
     <:BLACK, WHITE > Write-ColorTags: Lorem ipsum <:Gray,>
 Lorem ipsum dolor sit amet,

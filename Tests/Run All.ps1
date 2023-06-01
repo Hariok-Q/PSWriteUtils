@@ -4,7 +4,7 @@ foreach ($file in Get-ChildItem) {
 
     . $file.FullName
 
-    Write-Host ("`n`n" + ('# ' * ($Global:Host.UI.RawUI.BufferSize.Width/2)) + "`n`n")
+    Write-Host ("`n`n`n`n" + ('# ' * ($Global:Host.UI.RawUI.BufferSize.Width/2)) + "`n`n")
 }
 
 Pause

@@ -1,6 +1,5 @@
 using module '..\PSWriteUtils.psm1'
 
-Write-Host ''
 Write-ColorTags -Text "    <:black, white> Write-Status: Default settings "
 Write-Status -Type 'info' -Message 'Information message' -Details "These are the details."
 Write-Host ''
