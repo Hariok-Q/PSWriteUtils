@@ -297,8 +297,61 @@ class PSWriteUtils {
     
         Write-Host ("`r" + ' ' * ($Indentation + $Message.Length + $Seconds.ToString().Length + 1) + "`r") -NoNewline
     }
-
 }
 
 $PSWriteUtils = [PSWriteUtils]::new()
+
+function Write-ColorTags {
+    param(
+        [string] $Text,
+        [switch] $NoNewLine
+    )
+
+    $PSWriteUtils.WriteColorTags($Text, $NoNewLine)
+}
+
+function Write-Status {
+    param(
+        [Parameter(Mandatory)][ValidateSet('Info', 'Success', 'Fail')]
+        [string] $Type,
+
+        [string] $Message,
+
+        [string] $Details
+    )
+
+    $PSWriteUtils.WriteStatus($Type, $Message, $Details)
+}
+
+function Write-Option {
+    param(
+        [Parameter(Mandatory)]
+        [string] $Key,
+
+        [Parameter(Mandatory)]
+        [string] $Name,
+
+        [string] $CurrentValue,
+
+        [switch] $IgnoreInvalid,
+
+        [int] $Indentation = 4
+    )
+
+    $PSWriteUtils.WriteOption($Key, $Name, $CurrentValue, $IgnoreInvalid, $Indentation)
+}
+
+function Write-Countdown {
+    param(
+        [string] $Message,
+        [int] $Seconds = 5,
+        [int] $Indentation
+    )
+
+    $PSWriteUtils.WriteCountdown($Message, $Seconds, $Indentation)
+}
+
+
+
+
 Export-ModuleMember -Function * -Alias * -Variable 'PSWriteUtils'
