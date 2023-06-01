@@ -2,7 +2,7 @@ using module '..\PSWriteUtils.psm1'
 
 Write-Host ''
 Write-ColorTags -Text @"
-    <:BLACK, WHITE >WriteColorTags: Lorem ipsum<:Gray,>
+    <:BLACK, WHITE > Write-ColorTags: Lorem ipsum <:Gray,>
 Lorem ipsum dolor sit amet,
 <:green,>consectetur adipiscing elit,
 sed do eiusmod tempor <:green, blue>incididunt ut labore et dolore magna aliqua.
@@ -25,12 +25,12 @@ Viverra ipsum nunc aliquet bibendum enim facilisis gravida neque.
 "@
 
 Write-Host ''
-Write-ColorTags -Text "    <:black, white>WriteColorTags: Single line<:,>"
+Write-ColorTags -Text "    <:black, white> Write-ColorTags: Single line <:,>"
 Write-ColorTags -Text "We'll go to <:RED, Blue>United Kingdom<:,>, <:Green, yeLlOw>Brazil<:default, default> and <:BLUE, whITE>Argentina<:,>."
 Write-ColorTags -Text "You can try escaping <<:red, white> tags like this <<:,>."
 
 Write-Host ''
-Write-ColorTags -Text "    <:  BLACk,white     >WriteColorTags: NoNewLine<:,>"
+Write-ColorTags -Text "    <:  BLACk,white     > Write-ColorTags: NoNewLine <:,>"
 Write-ColorTags -Text "<:red,yellow>Line 1<:,> / " -NoNewline
 Write-ColorTags -Text "<:blue,GREEN>Line 2<:,>" -NoNewline
 Write-Host ''

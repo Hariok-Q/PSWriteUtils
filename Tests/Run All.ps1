@@ -1,5 +1,6 @@
 foreach ($file in Get-ChildItem) {
     if ($file.Extension -ne '.ps1') { continue }
+    if ($file.BaseName -like "*Run All*") { continue }
 
     . $file.FullName
 
