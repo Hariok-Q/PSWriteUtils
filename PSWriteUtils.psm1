@@ -184,7 +184,7 @@ class PSWriteUtils {
             }
 
 
-            foreach ($colorType in $colors.Keys) {
+            foreach ($colorType in $colors.Clone().Keys) {
                 if ((-not $tag.Groups[$colorType].Value) -or ($tag.Groups[$colorType].Value -eq 'Default')) {
                     $colors[$colorType] = $this.ResolvedSettings.Defaults["${colorType}Color"]
                 }
