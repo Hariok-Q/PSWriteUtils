@@ -1,7 +1,8 @@
 using module '..\PSWriteUtils.psm1'
 
-Write-ColorTags -Text "    <:black, white> Write-Countdown: Default settings "
-Write-Countdown -Message "" -Seconds -1 -Indentation -1
-Write-Countdown -Message "This is not the default message..." -Seconds 3 -Indentation 0
-Write-Countdown -Message "" -Seconds 3 -Indentation -1
-Write-Countdown -Message "" -Seconds -1 -Indentation 8
+$WrUt = [PSWriteUtils]::new()
+$WrUt.WriteColorTags("    <:black, white> Write-Countdown: Default settings ", $false)
+$WrUt.WriteCountdown("", -1, -1)
+$WrUt.WriteCountdown("This is not the default message...", 3, 0)
+$WrUt.WriteCountdown("", 3, -1)
+$WrUt.WriteCountdown("", -1, 8)

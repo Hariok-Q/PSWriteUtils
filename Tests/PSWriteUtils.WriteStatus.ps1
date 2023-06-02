@@ -1,51 +1,51 @@
 using module '..\PSWriteUtils.psm1'
 
-Write-ColorTags -Text "    <:black, white> Write-Status: Default settings "
-Write-Status -Type 'info' -Message 'Information message' -Details "These are the details."
+$WrUt.WriteColorTags("    <:black, white> Write-Status: Default settings ", $false)
+$WrUt.WriteStatus('info', 'Information message', "These are the details.")
 Write-Host ''
-Write-Status -Type 'suCCess' -Message 'Success message' -Details "These are the details."
+$WrUt.WriteStatus('suCCess', 'Success message', "These are the details.")
 Write-Host ''
-Write-Status -Type 'FAIL' -Message 'Fail message' -Details @"
+$WrUt.WriteStatus('FAIL', 'Fail message', @"
 These are
 multiline details.
 Another one.
 
-"@
+"@)
 
 Write-Host ''
-Write-ColorTags -Text "    <:black, white> Write-Status: Changed settings "
-$PSWriteUtils.Settings.WriteStatus.Indentation = 4
-$PSWriteUtils.Settings.WriteStatus.Message.ForegroundColor = 'gray'
-$PSWriteUtils.Settings.WriteStatus.Message.BackgroundColor = 'darkgray'
-$PSWriteUtils.Settings.WriteStatus.Type.Info.Text = 'InFoRmAtIoN'
-$PSWriteUtils.Settings.WriteStatus.Type.Info.ForegroundColor = 'darkcyan'
-$PSWriteUtils.Settings.WriteStatus.Type.Info.BackgroundColor = 'white'
-$PSWriteUtils.Settings.WriteStatus.Type.Success.Text = 'SuCcEsS'
-$PSWriteUtils.Settings.WriteStatus.Type.Success.ForegroundColor = 'darkgreen'
-$PSWriteUtils.Settings.WriteStatus.Type.Success.BackgroundColor = 'white'
-$PSWriteUtils.Settings.WriteStatus.Type.Fail.Text = 'fAiL'
-$PSWriteUtils.Settings.WriteStatus.Type.Fail.ForegroundColor = 'darkred'
-$PSWriteUtils.Settings.WriteStatus.Type.Fail.BackgroundColor = 'white'
-$PSWriteUtils.Settings.WriteStatus.Details.Indentation = 8
-$PSWriteUtils.Settings.WriteStatus.Details.ForegroundColor = 'blue'
-$PSWriteUtils.Settings.WriteStatus.Details.BackgroundColor = 'darkblue'
-$PSWriteUtils.ApplySettings()
-Write-Status -Type 'info' -Message 'Information message' -Details "These are the details."
+$WrUt.WriteColorTags("    <:black, white> Write-Status: Changed settings ", $false)
+$WrUt.Settings.WriteStatus.Indentation = 4
+$WrUt.Settings.WriteStatus.Message.ForegroundColor = 'gray'
+$WrUt.Settings.WriteStatus.Message.BackgroundColor = 'darkgray'
+$WrUt.Settings.WriteStatus.Type.Info.Text = 'InFoRmAtIoN'
+$WrUt.Settings.WriteStatus.Type.Info.ForegroundColor = 'darkcyan'
+$WrUt.Settings.WriteStatus.Type.Info.BackgroundColor = 'white'
+$WrUt.Settings.WriteStatus.Type.Success.Text = 'SuCcEsS'
+$WrUt.Settings.WriteStatus.Type.Success.ForegroundColor = 'darkgreen'
+$WrUt.Settings.WriteStatus.Type.Success.BackgroundColor = 'white'
+$WrUt.Settings.WriteStatus.Type.Fail.Text = 'fAiL'
+$WrUt.Settings.WriteStatus.Type.Fail.ForegroundColor = 'darkred'
+$WrUt.Settings.WriteStatus.Type.Fail.BackgroundColor = 'white'
+$WrUt.Settings.WriteStatus.Details.Indentation = 8
+$WrUt.Settings.WriteStatus.Details.ForegroundColor = 'blue'
+$WrUt.Settings.WriteStatus.Details.BackgroundColor = 'darkblue'
+$WrUt.ApplySettings()
+$WrUt.WriteStatus('info', 'Information message', "These are the details.")
 Write-Host ''
-Write-Status -Type 'suCCess' -Message 'Success message' -Details "These are the details."
+$WrUt.WriteStatus('suCCess', 'Success message', "These are the details.")
 Write-Host ''
-Write-Status -Type 'FAIL' -Message 'Fail message' -Details @"
+$WrUt.WriteStatus('FAIL', 'Fail message', @"
 These are
 multiline details.
 Another one.
 
-"@
+"@)
 
 
 Write-Host ''
-Write-ColorTags -Text "    <:black, white> Write-Status: Type error "
+$WrUt.WriteColorTags("    <:black, white> Write-Status: Type error ", $false)
 try {
-    Write-Status -Type 'NotAType' -Message 'some message?' -Details "This should not print."
+    $WrUt.WriteStatus('NotAType', 'some message?', "This should not print.")
 }
 catch {
     Write-Host $Error[0].ToString() -ForegroundColor 'Red' -NoNewline

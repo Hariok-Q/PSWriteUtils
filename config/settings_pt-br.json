@@ -1,0 +1,28 @@
+{
+    "WriteStatus": {
+        "Type": {
+            "Info": {
+                "Text": "INFO"
+            },
+            "Fail": {
+                "Text": "FALHA"
+            },
+            "Success": {
+                "Text": "SUCESSO"
+            }
+        }
+    },
+    "WriteOption": {
+        "Invalid": {
+            "Value": {
+                "Text": "<INVÁLIDO>"
+            }
+        }
+    },
+    "WriteCountdown": {
+        "Message": {
+            "Text": "Aguardando... "
+        }
+    }
+}
+  

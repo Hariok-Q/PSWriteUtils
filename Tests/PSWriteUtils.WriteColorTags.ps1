@@ -1,6 +1,7 @@
 using module '..\PSWriteUtils.psm1'
 
-Write-ColorTags -Text @"
+$WrUt = [PSWriteUtils]::new()
+$WrUt.WriteColorTags(@"
     <:BLACK, WHITE > Write-ColorTags: Lorem ipsum <:Gray,>
 Lorem ipsum dolor sit amet,
 <:green,>consectetur adipiscing elit,
@@ -21,15 +22,15 @@ Lacus viverra vitae congue eu consequat ac felis donec.
 Proin libero nunc consequat interdum varius sit.
 Orci phasellus egestas tellus rutrum tellus pellentesque eu tincidunt. A iaculis at erat pellentesque.
 Viverra ipsum nunc aliquet bibendum enim facilisis gravida neque.
-"@
+"@, $false)
 
 Write-Host ''
-Write-ColorTags -Text "    <:black, white> Write-ColorTags: Single line <:,>"
-Write-ColorTags -Text "We'll go to <:RED, Blue>United Kingdom<:,>, <:Green, yeLlOw>Brazil<:default, default> and <:BLUE, whITE>Argentina<:,>."
-Write-ColorTags -Text "You can try escaping <<:red, white> tags like this <<:,>."
+$WrUt.WriteColorTags("    <:black, white> Write-ColorTags: Single line <:,>", $false)
+$WrUt.WriteColorTags("We'll go to <:RED, Blue>United Kingdom<:,>, <:Green, yeLlOw>Brazil<:default, default> and <:BLUE, whITE>Argentina<:,>.", $false)
+$WrUt.WriteColorTags("You can try escaping <<:red, white> tags like this <<:,>.", $false)
 
 Write-Host ''
-Write-ColorTags -Text "    <:  BLACk,white     > Write-ColorTags: NoNewLine <:,>"
-Write-ColorTags -Text "<:red,yellow>Line 1<:,> / " -NoNewline
-Write-ColorTags -Text "<:blue,GREEN>Line 2<:,>" -NoNewline
+$WrUt.WriteColorTags("    <:  BLACk,white     > Write-ColorTags: NoNewLine <:,>", $false)
+$WrUt.WriteColorTags("<:red,yellow>Line 1<:,> / ", $true)
+$WrUt.WriteColorTags("<:blue,GREEN>Line 2<:,>", $true)
 Write-Host ''
