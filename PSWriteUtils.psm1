@@ -2,81 +2,81 @@
 using namespace System.Management.Automation
 
 class PSWriteUtils {
-    $Settings = @{
-        FilesDefaults = @{
+    $Settings = [PSCustomObject]@{
+        FilesDefaults = [PSCustomObject]@{
             Prefix = 'settings';
             Extension = 'json'
         };
 
-        TextDefaults = @{
+        TextDefaults = [PSCustomObject]@{
             ForegroundColor = 'Gray';
             BackgroundColor = 'Default'
         };
 
-        WriteStatus = @{
+        WriteStatus = [PSCustomObject]@{
             Indentation = 0;
-            Message = @{
+            Message = [PSCustomObject]@{
                 ForegroundColor = 'White';
                 BackgroundColor = 'Black'
             };
-            Type = @{
-                Info = @{
+            Type = [PSCustomObject]@{
+                Info = [PSCustomObject]@{
                     Text = 'INFO';
                     ForegroundColor = 'Blue';
                     BackgroundColor = 'Black'
                 };
-                Success = @{
+                Success = [PSCustomObject]@{
                     Text = 'SUCCESS';
                     ForegroundColor = 'Green';
                     BackgroundColor = 'Black'
                 };
-                Fail = @{
+                Fail = [PSCustomObject]@{
                     Text = 'FAIL';
                     ForegroundColor = 'Red';
                     BackgroundColor = 'Black'
                 }
             };
-            Details = @{
+            Details = [PSCustomObject]@{
                 Indentation = 4;
                 ForegroundColor = 'Gray';
                 BackgroundColor = 'Default'
             }
         };
 
-        WriteOption = @{
+        WriteOption = [PSCustomObject]@{
             Indentation = 0;
-            Valid = @{
-                General = @{
+            Valid = [PSCustomObject]@{
+                General = [PSCustomObject]@{
                     ForegroundColor = 'Default';
                     BackgroundColor = 'Default'
                 };
-                Key = @{
+                Key = [PSCustomObject]@{
                     ForegroundColor = 'Yellow';
                     BackgroundColor = 'Default'
                 };
-                KeyBrackets = @{
+                KeyBrackets = [PSCustomObject]@{
                     ForegroundColor = 'Default';
                     BackgroundColor = 'Default'
                 };
-                Value = @{
+                Value = [PSCustomObject]@{
                     ForegroundColor = 'Default';
                     BackgroundColor = 'Default'
                 }
             };
-            Invalid = @{
-                General = @{
+            Invalid = [PSCustomObject]@{
+                General = [PSCustomObject]@{
                     ForegroundColor = 'Default';
                     BackgroundColor = 'Default'
                 };
-                Key = @{
+                Key = [PSCustomObject]@{
                     ForegroundColor = 'Red';
                     BackgroundColor = 'Default'
                 };
-                KeyBrackets = @{
+                KeyBrackets = [PSCustomObject]@{
                     ForegroundColor = 'Default';
                     BackgroundColor = 'Default'
                 };
-                Value = @{
+                Value = [PSCustomObject]@{
                     ForegroundColor = 'DarkGray';
                     BackgroundColor = 'Default';
                     Text = '<INVALID>'
@@ -84,21 +84,21 @@ class PSWriteUtils {
             }
         };
 
-        WriteCountdown = @{
+        WriteCountdown = [PSCustomObject]@{
             Indentation = 0;
-            Message = @{
+            Message = [PSCustomObject]@{
                 Text = 'Waiting... ';
                 ForegroundColor = 'Default';
                 BackgroundColor = 'Default'
             };
-            Seconds = @{
+            Seconds = [PSCustomObject]@{
                 Amount = 5;
                 ForegroundColor = 'Cyan';
                 BackgroundColor = 'Default'
             }
         }
     }
-    hidden $AppliedSettings = @{}
+    hidden $AppliedSettings = [PSCustomObject]@{}
 
     hidden static $ColorTagsRegex = [Regex]::new(
         '(?<Escape><)?(?<Total><: *(?<Foreground>\w*), *(?<Background>\w*) *>)',
@@ -114,23 +114,23 @@ class PSWriteUtils {
     }
 
     PSWriteUtils([string]$SettingsFilePath) {
-        $this.AppliedSettings = $this.CloneSettings()
+        $this.AppliedSettings = [PSWriteUtils]::DeepClone($this.Settings)
         $this.LoadSettingsFile($SettingsFilePath)
         $this.ApplySettings()
     }
 
     PSWriteUtils([string]$SettingsDirectoryPath, [cultureinfo]$CultureInfo) {
-        $this.AppliedSettings = $this.CloneSettings()
+        $this.AppliedSettings = [PSWriteUtils]::DeepClone($this.Settings)
         $this.LoadSettingsDirectory($SettingsDirectoryPath, $CultureInfo)
         $this.ApplySettings()
     }
 
-    hidden [hashtable] CloneSettings() {
-        return [PSSerializer]::Deserialize([PSSerializer]::Serialize($this.Settings))
+    hidden static [psobject] DeepClone([psobject]$SettingsNode) {
+        return [PSSerializer]::Deserialize([PSSerializer]::Serialize($SettingsNode))
     }
 
     [void] ApplySettings() {
-        $this.AppliedSettings = $this.CloneSettings()
+        $this.AppliedSettings = [PSWriteUtils]::DeepClone($this.Settings)
         $this.RecursiveResolveSettingsColors($this.AppliedSettings)
         $Global:Host.UI.RawUI.ForegroundColor = $this.AppliedSettings.TextDefaults.ForegroundColor
         $Global:Host.UI.RawUI.BackgroundColor = $this.AppliedSettings.TextDefaults.BackgroundColor
@@ -141,7 +141,7 @@ class PSWriteUtils {
     }
 
     [void] LoadSettingsFile([string]$Path) {
-        $this.RecursiveOverwriteSettings((Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json -AsHashtable), $this.Settings)
+        $this.RecursiveOverwriteSettings((Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json), $this.Settings)
     }
 
     [void] LoadLocaleSettingsFile([string]$SettingsDirectoryPath, [cultureinfo]$CultureInfo) {
@@ -212,15 +212,41 @@ class PSWriteUtils {
         }
     }
 
-    hidden [void] RecursiveOverwriteSettings([hashtable]$OriginSettingsNode, [hashtable]$DestinationSettingsNode) {
-        foreach ($key in $OriginSettingsNode.Keys) {
-            if ($DestinationSettingsNode.Keys -notcontains $key) { continue }
-            if ($OriginSettingsNode[$key] -is [hashtable]) {
-                $this.RecursiveOverwriteSettings($OriginSettingsNode[$key], $DestinationSettingsNode[$key])
+    hidden static [void] RecursiveOverwriteSettings([psobject]$OriginSettingsNode, [psobject]$DestinationSettingsNode) {
+        foreach ($originProperty in $OriginSettingsNode.psobject.Properties) {
+            $destinationProperty = $DestinationSettingsNode.psobject.Properties.Item($originProperty.Name)
+            
+            if (-not $destinationProperty) {
+                Add-Member -InputObject $DestinationSettingsNode `
+                    -NotePropertyName $originProperty.Name `
+                    -NotePropertyValue [PSWriteUtils]::DeepClone($originProperty.Value)
                 continue
             }
 
-            $DestinationSettingsNode[$key] = $OriginSettingsNode[$key]
+            if ($originProperty.Value -is [psobject]) {
+                if ($destinationProperty.Value -is [psobject]) {
+                    [PSWriteUtils]::RecursiveOverwriteSettings($originProperty.Value, $destinationProperty.Value)
+                }
+                else {
+                    $destinationProperty.Value = [PSWriteUtils]::DeepClone($originProperty.Value)
+                }
+                continue
+            }
+
+            if ()
+            Add-Member -InputObject $DestinationSettingsNode `
+                -NotePropertyName $originProperty.Name -NotePropertyValue $originProperty.Value
+        }
+
+
+        foreach ($originPropertyName in $OriginSettingsNode.psobject.Properties.Name) {
+            if ($DestinationSettingsNode.psobject.Properties -notcontains $originPropertyName) { continue }
+            if ($OriginSettingsNode.psobject.Item($originPropertyName) -is [hashtable]) {
+                [PSWriteUtils]::RecursiveOverwriteSettings($OriginSettingsNode[$originPropertyName], $DestinationSettingsNode[$originPropertyName])
+                continue
+            }
+
+            $DestinationSettingsNode[$originPropertyName] = $OriginSettingsNode[$originPropertyName]
         }
     }
 
